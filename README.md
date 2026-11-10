@@ -1,59 +1,57 @@
-# NativeFederationLab
+# Native Federation Lab
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.6.
+A micro-frontend demo built with **Angular 22** and **[Native Federation](https://native-federation.com)**. A **shell** (host) provides the main layout and routing, and loads two independently built remotes, **mfe1** and **mfe2**, at runtime.
 
-## Development server
+## Architecture
 
-To start a local development server, run:
+| App   | Port | Role |
+|-------|------|------|
+| shell | 4200 | Host: sidebar, header, footer, main content, routing |
+| mfe1  | 4201 | Remote, exposes `./Component` |
+| mfe2  | 4202 | Remote, exposes `./Component` |
 
-```bash
-ng serve
+```
+Browser ─► shell (:4200) ──federation.manifest.json──► mfe1 /remoteEntry.json (:4201)
+                                                    └► mfe2 /remoteEntry.json (:4202)
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Features
+- Responsive layout: sidebar becomes a slide-out drawer under 860px.
+- Routes: `/` (Home), `/mfe1`, `/mfe2` (lazy-loaded remotes), `**` (404).
+- Friendly "remote unavailable" page if a remote is not running.
+- Shared Angular singletons between shell and remotes.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Getting started
 
 ```bash
-ng generate --help
+npm install
+npm run start:all
 ```
 
-## Building
+Then open http://localhost:4200. `start:all` runs mfe1, mfe2 and the shell together. To run one app: `npx ng serve <shell|mfe1|mfe2>` (start the remotes first).
 
-To build the project run:
+## Build and test
 
 ```bash
-ng build
+npx ng build <shell|mfe1|mfe2>
+npx ng test <shell|mfe1|mfe2> --watch=false
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Project structure
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
+```
+projects/
+  shell/   layout (src/app/app.*), routes (app.routes.ts), public/federation.manifest.json
+  mfe1/    remote, federation.config.mjs exposes ./Component
+  mfe2/    remote, federation.config.mjs exposes ./Component
+scripts/start-all.mjs   starts all apps
 ```
 
-## Running end-to-end tests
+## Adding a new remote
+1. Generate the app and add Native Federation as a remote on the next port (e.g. 4203).
+2. Expose `./Component` in its `federation.config.mjs`.
+3. Add it to `projects/shell/public/federation.manifest.json`, a route in `app.routes.ts`, and a nav item in `app.ts`.
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Contributor docs
+- [AI.md](./AI.md) – detailed project guide and enhancement backlog.
+- [RULES.md](./RULES.md) – rules to follow on every change.

@@ -1,0 +1,52 @@
+<div class="layout" [class.sidebar-open]="sidebarOpen()">
+  <aside class="sidebar" aria-label="Main navigation">
+    <a class="brand" routerLink="/" (click)="closeSidebar()">
+      <span class="brand-logo">⬡</span>
+      <span class="brand-name">Federation Lab</span>
+    </a>
+    <nav>
+      @for (item of navItems; track item.path) {
+        <a
+          class="nav-link"
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+          (click)="closeSidebar()"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-text">
+            <strong>{{ item.label }}</strong>
+            <small>{{ item.description }}</small>
+          </span>
+        </a>
+      }
+    </nav>
+  </aside>
+
+  <div class="backdrop" (click)="closeSidebar()"></div>
+
+  <div class="main">
+    <header class="header">
+      <button
+        class="menu-btn"
+        type="button"
+        aria-label="Toggle navigation"
+        [attr.aria-expanded]="sidebarOpen()"
+        (click)="toggleSidebar()"
+      >
+        ☰
+      </button>
+      <h1>{{ pageTitle() }}</h1>
+      <span class="badge">Shell · :4200</span>
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+
+    <footer class="footer">
+      <span>© {{ year }} Native Federation Lab</span>
+      <span>Angular + Native Federation</span>
+    </footer>
+  </div>
+</div>
